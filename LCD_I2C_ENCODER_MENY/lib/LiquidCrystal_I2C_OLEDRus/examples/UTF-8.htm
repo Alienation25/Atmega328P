@@ -1,0 +1,519 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>UTF-8</title>
+<style>
+	sub,sup {font-size:80%}
+	#dva td {text-align:center}
+	</style>
+</head>
+<body>
+<table align="center" border="0" cellpadding="10" cellspacing="0" width="630">
+  <tbody>
+  <tr>
+    <td>
+      <h1>
+      <center>Представление кириллицы в UTF-8</center></h1>
+  </td></tr>
+  <tr>
+    <td>В кодировке <i>UTF-8</i> унаследованы однобайтные (точнее, 7-битные) коды символов 
+	<a href="http://i.voenmeh.ru/kafi5/Kam.loc/inform/ASCII7.htm">ASCII-7</a> (коды от 0 до 127), т.е. одним байтом кодируются латинские буквы,
+	цифры и специальные символы.
+	Русские буквы (кириллица) представляются 16-битными 
+      (двухбайтными) кодами: 
+	<p style="text-align:center">
+    110XXXXX 10XXXXXX, </p>
+	<p>где X обозначены двоичные разряды для размещения 
+      кода символа в соответствии с таблицей <i>UNICODE</i>.</p><p>
+	  Юникод (англ. Unicode) — стандарт кодирования символов, позволяющий представить знаки почти всех письменных языков.
+	  Представляемые в юникоде символы кодируются целыми числами без знака. Эти числа будем называть кодами символов в
+	  юникоде или просто <i>UNICODE</i>.
+	  Юникод имеет несколько форм представления символов в компьютере: <i>UTF-8, UTF-16 (UTF-16BE, UTF-16LE) и UTF-32 (UTF-32BE, UTF-32LE)</i>. (Англ. Unicode transformation format - UTF).</p><p>
+	  Рассмотрим, как кодируется в <i>UTF-8</i> буква <i>Ж</i>. Её <i>UNICODE</i> - 1046<sub>10</sub> или 0416<sub>16</sub> или 
+	  10000 010110<sub>2</sub>. <i>UNICODE</i> в двоичном виде разбивается на две части: пять левых бит и шесть правых. Левая часть дополняется до байта признаком <b>110</b> двухбайтного кода <i>UTF-8</i>: <b>110</b>10000. К правой части приписываются два бита <b>10</b> признака продолжения многобайтного кода: <b>10</b>010110. Окончательно код  буквы <i>Ж</i> в <i>UTF-8</i> выглядит так:
+	  </p><p style="text-align:center">
+	  <b>110</b>10000 <b>10</b>010110<sub>2</sub><br> или D0 96<sub>16</sub></p><p>
+	  Таким образом, русская буква кодируется дважды: сначала в 11-битный <i>UNICODE</i>, а затем -  в 16-битный UTF-8.
+	  </p><p>В приведённой ниже таблице, кроме кодов <i>UNICODE</i> и <i>UTF-8</i> в шестнадцатиричной системе счисления, даны коды <i>UTF-8</i> 
+	  в десятичной системе счисления и для сравнения коды кириллицы в кодировке <i>CP-1251</i>, иначе называемой <i>windovs-1251</i>. 
+	 
+      </p><center>
+      <table id="dva" border="1" cellpadding="5" cellspacing="0">
+	  <caption style="font-size:16pt">Таблица кодов кириллицы в UTF-8</caption>
+        <tbody>
+        <tr>
+          <th rowspan="2" width="16%">Символ 
+          </th><th colspan="2">UNICODE 
+		  </th><th colspan="2">UTF-8
+          </th><th rowspan="2">CP-1251
+        </th></tr><tr>
+		<th width="16%">Шестн.
+          </th><th width="16%">Десят
+		</th><th width="16%">Шестн.
+          </th><th width="16%">Десят  
+          </th></tr><tr><td width="16%">А 
+          </td><td width="16%">0410 
+		  
+		  </td><td width="16%">1040
+          </td><td width="16%">D090 
+          </td><td width="16%">208 144
+          </td><td width="16%">192 
+        </td></tr><tr>
+          <td width="16%">Б 
+          </td><td width="16%">0411
+		  </td><td width="16%">1041
+          </td><td width="16%">D091 
+		  </td><td width="16%">208 145 
+          </td><td width="16%">193 
+        </td></tr><tr>
+          <td width="16%">В 
+          </td><td width="16%">0412 
+		  </td><td width="16%">1042
+          </td><td width="16%">D092   
+		  </td><td width="16%">208 146 
+          </td><td width="16%">194 
+        </td></tr><tr>
+          <td width="16%">Г 
+          </td><td width="16%">0413 
+		  </td><td width="16%">1043
+          </td><td width="16%">D093 
+          </td><td width="16%">208 147
+          </td><td width="16%">195 
+        </td></tr><tr>
+          <td width="16%">Д 
+          </td><td width="16%">0414
+		  </td><td width="16%">1044
+          </td><td width="16%">D094 
+          </td><td width="16%">208 148
+          </td><td width="16%">196 
+        </td></tr><tr>
+          <td width="16%">Е 
+          </td><td width="16%">0415 
+		   </td><td width="16%">1045
+          </td><td width="16%">D095 
+          </td><td width="16%">208 149
+          </td><td width="16%">197 
+        </td></tr><tr>
+          <td width="16%">Ж 
+          </td><td width="16%">0416 
+		  </td><td width="16%">1046
+          </td><td width="16%">D096 
+          </td><td width="16%">208 150
+          </td><td width="16%">198 
+        </td></tr><tr>
+          <td width="16%">З 
+          </td><td width="16%">0417 
+		  </td><td width="16%">1047
+          </td><td width="16%">D097 
+          </td><td width="16%">208 151
+          </td><td width="16%">199 
+        </td></tr><tr>
+          <td width="16%">И 
+          </td><td width="16%">0418 
+		  </td><td width="16%">1048
+          </td><td width="16%">D098 
+          </td><td width="16%">208 152
+          </td><td width="16%">200 
+        </td></tr><tr>
+          <td width="16%">Й 
+          </td><td width="16%">0419 
+		  </td><td width="16%">1049
+          </td><td width="16%">D099 
+          </td><td width="16%">208 153
+          </td><td width="16%">201 
+        </td></tr><tr>
+          <td width="16%">К 
+          </td><td width="16%">041A 
+		  </td><td width="16%">1050
+          </td><td width="16%">D09A 
+          </td><td width="16%">208 154
+          </td><td width="16%">202 
+        </td></tr><tr>
+          <td width="16%">Л 
+          </td><td width="16%">041B
+		  </td><td width="16%">1051		  
+          </td><td width="16%">D09B 
+          </td><td width="16%">208 155
+          </td><td width="16%">203 
+        </td></tr><tr>
+          <td width="16%">М 
+          </td><td width="16%">041C 
+		  </td><td width="16%">1052
+          </td><td width="16%">D09C 
+          </td><td width="16%">208 156
+          </td><td width="16%">204 
+        </td></tr><tr>
+          <td width="16%">Н 
+          </td><td width="16%">041D 
+		  </td><td width="16%">1053
+          </td><td width="16%">D09D 
+          </td><td width="16%">208 157
+          </td><td width="16%">205 
+        </td></tr><tr>
+          <td width="16%">О 
+          </td><td width="16%">041E
+</td><td width="16%">1054		  
+          </td><td width="16%">D09E 
+          </td><td width="16%">208 158
+          </td><td width="16%">206 
+        </td></tr><tr>
+          <td width="16%">П 
+          </td><td width="16%">041F 
+		  </td><td width="16%">1055
+          </td><td width="16%">D09F 
+          </td><td width="16%">208 159
+          </td><td width="16%">207 
+        </td></tr><tr>
+          <td width="16%">Р 
+          </td><td width="16%">0420 
+		  </td><td width="16%">1056
+          </td><td width="16%">D0A0 
+          </td><td width="16%">208 160
+          </td><td width="16%">208 
+        </td></tr><tr>
+          <td width="16%">С 
+          </td><td width="16%">0421 
+		  </td><td width="16%">1057
+          </td><td width="16%">D0A1 
+          </td><td width="16%">208 161
+          </td><td width="16%">209 
+        </td></tr><tr>
+          <td width="16%">Т 
+          </td><td width="16%">0422 
+		  </td><td width="16%">1058
+          </td><td width="16%">D0A2 
+          </td><td width="16%">208 162
+          </td><td width="16%">210 
+        </td></tr><tr>
+          <td width="16%">У 
+          </td><td width="16%">0423 
+		  </td><td width="16%">1059
+          </td><td width="16%">D0A3 
+          </td><td width="16%">208 163
+          </td><td width="16%">211 
+        </td></tr><tr>
+          <td width="16%">Ф 
+          </td><td width="16%">0424 
+		  </td><td width="16%">1060
+          </td><td width="16%">D0A4 
+          </td><td width="16%">208 164
+          </td><td width="16%">212 
+        </td></tr><tr>
+          <td width="16%">Х 
+          </td><td width="16%">0425 
+		  </td><td width="16%">1061
+          </td><td width="16%">D0A5 
+          </td><td width="16%">208 165
+          </td><td width="16%">213 
+        </td></tr><tr>
+          <td width="16%">Ц 
+          </td><td width="16%">0426 
+		  </td><td width="16%">1062
+          </td><td width="16%">D0A6 
+          </td><td width="16%">208 166
+          </td><td width="16%">214 
+        </td></tr><tr>
+          <td width="16%">Ч
+          </td><td width="16%">0427
+		  </td><td width="16%">1063		  
+          </td><td width="16%">D0A7 
+          </td><td width="16%">208 167
+          </td><td width="16%">215 
+        </td></tr><tr>
+          <td width="16%">Ш 
+          </td><td width="16%">0428 
+		  </td><td width="16%">1064
+          </td><td width="16%">D0A8 
+          </td><td width="16%">208 168
+          </td><td width="16%">216 
+        </td></tr><tr>
+          <td width="16%">Щ 
+          </td><td width="16%">0429 
+		  </td><td width="16%">1065
+          </td><td width="16%">D0A9 
+          </td><td width="16%">208 169
+          </td><td width="16%">217 
+        </td></tr><tr>
+          <td width="16%">Ъ 
+          </td><td width="16%">042A 
+		  </td><td width="16%">1066
+          </td><td width="16%">D0AA 
+          </td><td width="16%">208 170
+          </td><td width="16%">218 
+        </td></tr><tr>
+          <td width="16%">Ы 
+          </td><td width="16%">042B 
+		  </td><td width="16%">1067
+          </td><td width="16%">D0AB 
+          </td><td width="16%">208 171
+          </td><td width="16%">219 
+        </td></tr><tr>
+          <td width="16%">Ь 
+          </td><td width="16%">042C
+			</td><td width="16%">1068
+          </td><td width="16%">D0AC 
+          </td><td width="16%">208 172
+          </td><td width="16%">220 
+        </td></tr><tr>
+          <td width="16%">Э 
+          </td><td width="16%">042D
+			</td><td width="16%">1069
+          </td><td width="16%">D0AD 
+          </td><td width="16%">208 173
+          </td><td width="16%">221 
+        </td></tr><tr>
+          <td width="16%">Ю 
+          </td><td width="16%">042E
+		  </td><td width="16%">1070
+          </td><td width="16%">D0AE 
+          </td><td width="16%">208 174
+          </td><td width="16%">222 
+        </td></tr><tr>
+          <td width="16%">Я 
+          </td><td width="16%">042F 
+		  </td><td width="16%">1071
+          </td><td width="16%">D0AF 
+          </td><td width="16%">208 175
+          </td><td width="16%">223 
+        </td></tr><tr>
+          <td width="16%">а 
+          </td><td width="16%">0430 
+		  </td><td width="16%">1072
+          </td><td width="16%">D0B0 
+          </td><td width="16%">208 176
+          </td><td width="16%">224 
+        </td></tr><tr>
+          <td width="16%">б 
+          </td><td width="16%">0431
+		  </td><td width="16%">1073
+          </td><td width="16%">D0B1 
+          </td><td width="16%">208 177
+          </td><td width="16%">225 
+        </td></tr><tr>
+          <td width="16%">в 
+          </td><td width="16%">0432 
+		  </td><td width="16%">1074
+          </td><td width="16%">D0B2 
+          </td><td width="16%">208 178
+          </td><td width="16%">226 
+        </td></tr><tr>
+          <td width="16%">г 
+          </td><td width="16%">0433 
+		  </td><td width="16%">1075
+          </td><td width="16%">D0B3 
+          </td><td width="16%">208 179
+          </td><td width="16%">227 
+        </td></tr><tr>
+          <td width="16%">д 
+          </td><td width="16%">0434 
+		  </td><td width="16%">1076
+          </td><td width="16%">D0B4 
+          </td><td width="16%">208 180
+          </td><td width="16%">228 
+        </td></tr><tr>
+          <td width="16%">е 
+          </td><td width="16%">0435 
+		  </td><td width="16%">1077
+          </td><td width="16%">D0B5 
+          </td><td width="16%">208 181
+          </td><td width="16%">229 
+        </td></tr><tr>
+          <td width="16%">ж 
+          </td><td width="16%">0436 
+		  </td><td width="16%">1078
+          </td><td width="16%">D0B6 
+          </td><td width="16%">208 182
+          </td><td width="16%">230 
+        </td></tr><tr>
+          <td width="16%">з 
+          </td><td width="16%">0437
+</td><td width="16%">1079		  
+          </td><td width="16%">D0B7 
+          </td><td width="16%">208 183
+          </td><td width="16%">231 
+        </td></tr><tr>
+          <td width="16%">и 
+          </td><td width="16%">0438 
+		  </td><td width="16%">1080
+          </td><td width="16%">D0B8 
+          </td><td width="16%">208 184
+          </td><td width="16%">232 
+        </td></tr><tr>
+          <td width="16%">й 
+          </td><td width="16%">0439 
+		  </td><td width="16%">1081
+          </td><td width="16%">D0B9 
+          </td><td width="16%">208 185
+          </td><td width="16%">233 
+        </td></tr><tr>
+          <td width="16%">к 
+          </td><td width="16%">043A 
+		  </td><td width="16%">1082
+          </td><td width="16%">D0BA 
+          </td><td width="16%">208 186
+          </td><td width="16%">234 
+        </td></tr><tr>
+          <td width="16%">л 
+          </td><td width="16%">043B 
+		  </td><td width="16%">1083
+          </td><td width="16%">D0BB 
+          </td><td width="16%">208 187
+          </td><td width="16%">235 
+        </td></tr><tr>
+          <td width="16%">м 
+          </td><td width="16%">043C 
+		  </td><td width="16%">1084
+          </td><td width="16%">D0BC 
+          </td><td width="16%">208 188
+          </td><td width="16%">236 
+        </td></tr><tr>
+          <td width="16%">н 
+          </td><td width="16%">043D
+		  </td><td width="16%">1085		  
+          </td><td width="16%">D0BD 
+          </td><td width="16%">208 189
+          </td><td width="16%">237 
+        </td></tr><tr>
+          <td width="16%">о 
+          </td><td width="16%">043E 
+		  </td><td width="16%">1086
+          </td><td width="16%">D0BE 
+          </td><td width="16%">208 190
+          </td><td width="16%">238 
+        </td></tr><tr>
+          <td width="16%">п 
+          </td><td width="16%">043F 
+		  </td><td width="16%">1087
+          </td><td width="16%">D0BF 
+          </td><td width="16%">208 191
+          </td><td width="16%">239 
+        </td></tr><tr>
+          <td width="16%">р 
+          </td><td width="16%">0440 
+		  </td><td width="16%">1088
+          </td><td width="16%">D180 
+          </td><td width="16%">209 128
+          </td><td width="16%">240 
+        </td></tr><tr>
+          <td width="16%">с 
+          </td><td width="16%">0441 
+		  </td><td width="16%">1089
+          </td><td width="16%">D181 
+          </td><td width="16%">209 129
+          </td><td width="16%">241 
+        </td></tr><tr>
+          <td width="16%">т 
+          </td><td width="16%">0442
+			</td><td width="16%">1090
+          </td><td width="16%">D182 
+          </td><td width="16%">209 130
+          </td><td width="16%">242 
+        </td></tr><tr>
+          <td width="16%">у 
+          </td><td width="16%">0443 
+		  </td><td width="16%">1091
+          </td><td width="16%">D183 
+          </td><td width="16%">209 131
+          </td><td width="16%">243 
+        </td></tr><tr>
+          <td width="16%">ф 
+          </td><td width="16%">0444 
+		  </td><td width="16%">1092
+          </td><td width="16%">D184 
+          </td><td width="16%">209 132
+          </td><td width="16%">244 
+        </td></tr><tr>
+          <td width="16%">х 
+          </td><td width="16%">0445 
+		  </td><td width="16%">1093
+          </td><td width="16%">D185 
+          </td><td width="16%">209 133
+          </td><td width="16%">245 
+        </td></tr><tr>
+          <td width="16%">ц 
+          </td><td width="16%">0446 
+		  </td><td width="16%">1094
+          </td><td width="16%">D186 
+          </td><td width="16%">209 134
+          </td><td width="16%">246 
+        </td></tr><tr>
+          <td width="16%">ч 
+          </td><td width="16%">0447 
+		  </td><td width="16%">1095
+          </td><td width="16%">D187 
+          </td><td width="16%">209 135
+          </td><td width="16%">247 
+        </td></tr><tr>
+          <td width="16%">ш 
+          </td><td width="16%">0448 
+		  </td><td width="16%">1096
+          </td><td width="16%">D188 
+          </td><td width="16%">209 136
+          </td><td width="16%">248 
+        </td></tr><tr>
+          <td width="16%">щ 
+          </td><td width="16%">0449
+		</td><td width="16%">1097		  
+          </td><td width="16%">D189 
+          </td><td width="16%">209 137
+          </td><td width="16%">249 
+        </td></tr><tr>
+          <td width="16%">ъ 
+          </td><td width="16%">044A 
+		  </td><td width="16%">1098
+          </td><td width="16%">D18A 
+          </td><td width="16%">209 138
+          </td><td width="16%">250 
+        </td></tr><tr>
+          <td width="16%">ы 
+          </td><td width="16%">044B
+		  </td><td width="16%">1099		  
+          </td><td width="16%">D18B 
+          </td><td width="16%">209 139
+          </td><td width="16%">251 
+        </td></tr><tr>
+          <td width="16%">ь 
+          </td><td width="16%">044C 
+		  </td><td width="16%">1100
+          </td><td width="16%">D18C 
+          </td><td width="16%">209 140
+          </td><td width="16%">252 
+        </td></tr><tr>
+          <td width="16%">э 
+          </td><td width="16%">044D	
+		  </td><td width="16%">1101
+          </td><td width="16%">D18D 
+          </td><td width="16%">209 141
+          </td><td width="16%">253 
+        </td></tr><tr>
+          <td width="16%">ю 
+          </td><td width="16%">044E 
+		  </td><td width="16%">1102
+          </td><td width="16%">D18E
+          </td><td width="16%">209 142
+          </td><td width="16%">254 
+        </td></tr><tr>
+          <td width="16%">я 
+          </td><td width="16%">044F 
+		  </td><td width="16%">1103
+          </td><td width="16%">D18F 
+          </td><td width="16%">209 143
+          </td><td width="16%">255 
+        </td></tr><tr>
+          <td colspan="6" align="center">Символы вне общего правила
+        </td></tr><tr>
+          <td width="16%">Ё 
+          </td><td width="16%">0401 
+		  </td><td width="16%">1025
+          </td><td width="16%">D081 
+          </td><td width="16%">208 101
+          </td><td width="16%">168 
+        </td></tr><tr>
+          <td width="16%">ё 
+          </td><td width="16%">0451 
+		  </td><td width="16%">1025
+          </td><td width="16%">D191 
+          </td><td width="16%">209 145
+          </td><td width="16%">184 </td></tr></tbody></table></center>
+  </td></tr></tbody></table>
+</body></html>

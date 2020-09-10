@@ -1,5 +1,5 @@
 {
-  "name": "LiquidCrystal_I2C",
+  "name": "LiquidCrystal_I2C_OLED",
   "keywords": "LCD, liquidcrystal, I2C",
   "description": "A library for DFRobot I2C LCD displays",
   "repository":

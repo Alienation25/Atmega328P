@@ -1,6 +1,6 @@
-//YWROBOT
-#ifndef LiquidCrystal_I2C_h
-#define LiquidCrystal_I2C_h
+//based on LiquidCrystal_I2C for YWROBOT https://github.com/marcoschwartz/LiquidCrystal_I2C
+#ifndef LiquidCrystal_I2C_OLED_h
+#define LiquidCrystal_I2C_OLED_h
 
 #include <inttypes.h>
 #include "Print.h" 
@@ -77,6 +77,9 @@ public:
   void autoscroll();
   void noAutoscroll(); 
   void createChar(uint8_t, uint8_t[]);
+  void createChar(uint8_t location, const char *charmap);
+  // Example: 	const char bell[8] PROGMEM = {B00100,B01110,B01110,B01110,B11111,B00000,B00100,B00000};
+  void outStr(char str[]);  
   void setCursor(uint8_t, uint8_t); 
 #if defined(ARDUINO) && ARDUINO >= 100
   virtual size_t write(uint8_t);

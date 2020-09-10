@@ -1,6 +1,6 @@
-// Based on the work by DFRobot
+//based on LiquidCrystal_I2C for YWROBOT https://github.com/marcoschwartz/LiquidCrystal_I2C
 
-#include "LiquidCrystal_I2C.h"
+#include "LiquidCrystal_I2C_OLED.h"
 #include <inttypes.h>
 #if defined(ARDUINO) && ARDUINO >= 100
 
@@ -22,8 +22,6 @@ inline void LiquidCrystal_I2C::write(uint8_t value) {
 
 #endif
 #include "Wire.h"
-
-
 
 // When the display powers up, it is configured as follows:
 //
@@ -59,7 +57,7 @@ void LiquidCrystal_I2C::init(){
 void LiquidCrystal_I2C::init_priv()
 {
 	Wire.begin();
-	_displayfunction = LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS;
+	_displayfunction = LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS | 0x02;
 	begin(_cols, _rows);  
 }
 
@@ -88,21 +86,30 @@ void LiquidCrystal_I2C::begin(uint8_t cols, uint8_t lines, uint8_t dotsize) {
 	// figure 24, pg 46
 	
 	  // we start in 8bit mode, try to set 4 bit mode
-   write4bits(0x03 << 4);
-   delayMicroseconds(4500); // wait min 4.1ms
+//   write4bits(0x03 << 4);
+//   delayMicroseconds(4500); // wait min 4.1ms
    
    // second try
-   write4bits(0x03 << 4);
-   delayMicroseconds(4500); // wait min 4.1ms
+//   write4bits(0x03 << 4);
+//   delayMicroseconds(4500); // wait min 4.1ms
    
    // third go!
-   write4bits(0x03 << 4); 
-   delayMicroseconds(150);
-   
+//   write4bits(0x03 << 4); 
+//   delayMicroseconds(150);
+	write4bits(0x00);
+	delayMicroseconds(100);
+	write4bits(0x00);
+	delayMicroseconds(100);
+	write4bits(0x00);
+	delayMicroseconds(100);
+	write4bits(0x00);
+	delayMicroseconds(100);
+	write4bits(0x00); 
+	delayMicroseconds(150);
+
    // finally, set to 4-bit interface
    write4bits(0x02 << 4); 
-
-
+   
 	// set # lines, font size, etc.
 	command(LCD_FUNCTIONSET | _displayfunction);  
 	
@@ -111,7 +118,7 @@ void LiquidCrystal_I2C::begin(uint8_t cols, uint8_t lines, uint8_t dotsize) {
 	display();
 	
 	// clear it off
-	clear();
+//	clear();
 	
 	// Initialize to default text direction (for roman languages)
 	_displaymode = LCD_ENTRYLEFT | LCD_ENTRYSHIFTDECREMENT;
@@ -125,8 +132,16 @@ void LiquidCrystal_I2C::begin(uint8_t cols, uint8_t lines, uint8_t dotsize) {
 
 /********** high level commands, for the user! */
 void LiquidCrystal_I2C::clear(){
-	command(LCD_CLEARDISPLAY);// clear display, set cursor position to zero
-	delayMicroseconds(2000);  // this command takes a long time!
+//  command(LCD_CLEARDISPLAY);  // clear display, set cursor position to zero
+//  delayMicroseconds(2000);  // this command takes a long time!
+    command(0x08);//��������� �����
+	delayMicroseconds(1000); 
+    command(0x17);//������������ � ��������� �����
+	delayMicroseconds(1000); 
+    command(0x01);//���������� clear, �������� �� ������ ���
+	delayMicroseconds(1000); 
+    command(0x04 | 0x08);//�������� �����
+	delayMicroseconds(1000); 
 }
 
 void LiquidCrystal_I2C::home(){
@@ -214,6 +229,15 @@ void LiquidCrystal_I2C::createChar(uint8_t location, uint8_t charmap[]) {
 	}
 }
 
+//createChar with PROGMEM input
+void LiquidCrystal_I2C::createChar(uint8_t location, const char *charmap) {
+	location &= 0x7; // we only have 8 locations 0-7
+	command(LCD_SETCGRAMADDR | (location << 3));
+	for (int i=0; i<8; i++) {
+	    	write(pgm_read_byte_near(charmap++));
+	}
+}
+
 // Turn the (optional) backlight off/on
 void LiquidCrystal_I2C::noBacklight(void) {
 	_backlightval=LCD_NOBACKLIGHT;
@@ -233,6 +257,86 @@ inline void LiquidCrystal_I2C::command(uint8_t value) {
 	send(value, 0);
 }
 
+void LiquidCrystal_I2C::outStr(char str[]){  
+      int nn = 0; // symbol counter
+      while (str[nn] != '\0')        {
+            switch (str[nn]&0xFF){
+			case 0xd0: break;	
+			case 0xd1: break;	
+            case 0x30: send(0x4F,HIGH); break; //0->'O'    
+            case 0x80: send(0x70,HIGH); break; //'�'    
+            case 0x81: send(0x63,HIGH); break; //'�'    
+            case 0x82: send(0xbf,HIGH); break; //'�'   
+            case 0x83: send(0x79,HIGH); break; //'�'   
+            case 0x84: send(0xe4,HIGH); break; //'�'   
+            case 0x85: send(0x78,HIGH); break; //'�'   
+            case 0x86: send(0xe5,HIGH); break; //'�'    
+            case 0x87: send(0xc0,HIGH); break; //'�'    
+            case 0x88: send(0xc1,HIGH); break; //'�'    
+            case 0x89: send(0xE6,HIGH); break; //'�'   
+            case 0x8A: send(0xc2,HIGH); break; //'�'   
+            case 0x8B: send(0xc3,HIGH); break; //'�'   
+            case 0x8C: send(0xc4,HIGH); break; //'�'   
+            case 0x8D: send(0xc5,HIGH); break; //'�'    
+            case 0x8E: send(0xc6,HIGH); break; //'�'    
+            case 0x8F: send(0xc7,HIGH); break; //'�'    
+//      --------------------  
+            case 0x90: send(0x41,HIGH); break; //'�'
+            case 0x91: send(0xa0,HIGH); break; //'�'
+            case 0x92: send(0x42,HIGH); break; //'�'
+            case 0x93: send(0xa1,HIGH); break; //'�'
+            case 0x94: send(0xE0,HIGH); break; //'�'
+            case 0x95: send(0x45,HIGH); break; //'�'
+            case 0x96: send(0xa3,HIGH); break; //'�'
+            case 0x97: send(0xa4,HIGH); break; //'�'
+            case 0x98: send(0xa5,HIGH); break; //'�'
+            case 0x99: send(0xa6,HIGH); break; //'�'
+            case 0x9A: send(0x4b,HIGH); break; //'�'
+            case 0x9B: send(0xa7,HIGH); break; //'�'
+            case 0x9C: send(0x4d,HIGH); break; //'�'
+            case 0x9D: send(0x48,HIGH); break; //'�'
+            case 0x9E: send(0x4f,HIGH); break; //'�'
+            case 0x9F: send(0xa8, HIGH); break; //'�'
+//      --------------------  
+            case 0xA0: send(0x50,HIGH); break; //'�'
+            case 0xA1: send(0x43,HIGH); break; //'�'
+            case 0xA2: send(0x54,HIGH); break; //'�'
+            case 0xA3: send(0xa9,HIGH); break; //'�'
+            case 0xA4: send(0xaa,HIGH); break; //'�'
+            case 0xA5: send(0x58,HIGH); break; //'�'
+            case 0xA6: send(0xe1,HIGH); break; //'�'
+            case 0xA7: send(0xab,HIGH); break; //'�'
+            case 0xA8: send(0xac,HIGH); break; //'�'
+            case 0xA9: send(0xe2,HIGH); break; //'�'
+            case 0xAA: send(0xad,HIGH); break; //'�'
+            case 0xAB: send(0xae,HIGH); break; //'�'
+            case 0xAC: send(0x62,HIGH); break; //eng'b'
+            case 0xAD: send(0xaf,HIGH); break; //'�'
+            case 0xAE: send(0xb0,HIGH); break; //'�'
+            case 0xAF: send(0xb1,HIGH); break; //'�'
+//      --------------------
+            case 0xB0: send(0x61,HIGH); break; //'�'
+            case 0xB1: send(0xb2,HIGH); break; //'�'
+            case 0xB2: send(0xb3,HIGH); break; //'�'
+            case 0xB3: send(0xb4,HIGH); break; //'�'
+            case 0xB4: send(0xe3,HIGH); break; //'�'
+            case 0xB5: send(0x65,HIGH); break; //'�'
+            case 0xB6: send(0xb6,HIGH); break; //'�'
+            case 0xB7: send(0xb7,HIGH); break; //'�'
+            case 0xB8: send(0xb8,HIGH); break; //'�'
+            case 0xB9: send(0xb9,HIGH); break; //'�'
+            case 0xBA: send(0xba,HIGH); break; //'�'
+            case 0xBB: send(0xbb,HIGH); break; //'�'
+            case 0xBC: send(0xbc,HIGH); break; //'�'
+            case 0xBD: send(0xbd,HIGH); break; //'�'
+            case 0xBE: send(0x6f,HIGH); break; //'�'
+            case 0xBF: send(0xbe,HIGH); break; //'�'
+            default: send(str[nn], HIGH); 
+        }
+   nn++;
+  }
+}
+
 
 /************ low level data pushing commands **********/
 
@@ -248,6 +352,7 @@ void LiquidCrystal_I2C::write4bits(uint8_t value) {
 	expanderWrite(value);
 	pulseEnable(value);
 }
+
 
 void LiquidCrystal_I2C::expanderWrite(uint8_t _data){                                        
 	Wire.beginTransmission(_Addr);
