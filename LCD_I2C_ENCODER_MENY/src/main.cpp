@@ -37,8 +37,8 @@ LiquidCrystal_I2C lcd(0x27,16,2);//экран Путь I2C и диагональ
 
 enum Language
 {
- Russion,
  English,
+ Russion,
 };
 
 enum Display_panel
@@ -50,7 +50,7 @@ enum Display_panel
 };
 
 
-volatile unsigned char language = Russion;//язык
+volatile unsigned char language = English;//язык
 volatile unsigned char numD = 1;//Номер экрана с котором работаем сейчас 
 
 
@@ -58,21 +58,22 @@ volatile unsigned char numD = 1;//Номер экрана с котором ра
 
 
 
-void lcd_input_text(char str[],unsigned char colum,unsigned char row){ //Ввод текста на экран 
+void lcd_input_text(char textE[],char textR[],unsigned char colum,unsigned char row){ //Ввод текста на экран 
   switch (language)
   {
-    case Russion:
-     lcd.clear();
-     lcd.setCursor(row,colum);
-     lcd.outStr(str);//команда для ввывода русского языка
-    break;
-    
+
     case English:
      lcd.clear();
      lcd.setCursor(row,colum);
-     lcd.print(str);//команда для ввывода английского языка
+     lcd.print(textE);//команда для ввывода английского языка
     break;
-
+    
+    case Russion:
+     lcd.clear();
+     lcd.setCursor(row,colum);
+     lcd.outStr(textR);//команда для ввывода русского языка
+    break;
+    
    default:
       break;
   }
@@ -81,21 +82,21 @@ void lcd_input_text(char str[],unsigned char colum,unsigned char row){ //Вво�
 
 
 
-void lcd_input_text(char str[]){
+void lcd_input_text(char textE[],char textR[]){
    switch (language)
   {
-    case Russion:
-     lcd.clear();
-     lcd.setCursor(0,1);
-     lcd.outStr(str);//команда для ввывода русского языка
-    break;
-    
     case English:
      lcd.clear();
      lcd.setCursor(0,1);
-     lcd.print(str);//команда для ввывода английского языка
+     lcd.print(textE);//команда для ввывода английского языка
     break;
-
+    
+    case Russion:
+     lcd.clear();
+     lcd.setCursor(0,1);
+     lcd.outStr(textR);//команда для ввывода русского языка
+    break;
+  
    default:
       break;
   }
@@ -107,13 +108,16 @@ void control_Display(unsigned char numD){
   switch (numD)
    {
    case DISPLAY_TEMP://дисплей отвечающий за температуру 
-   
+     lcd_input_text("Hello","Привет");  
+    
      break;
    case DISPLAY_WIND://дисплей для ветра 
-    lcd_input_text("WIND: WET");   
+    
+    lcd_input_text("WIND: WET","Ветер: ветрений");   
+    
      break;
    case DISPLAY_LUNIM://lbcgktq 
-     lcd_input_text('DAY: Time');  
+     lcd_input_text("DAY: Time","День: время");  
   
     break;
    default:
