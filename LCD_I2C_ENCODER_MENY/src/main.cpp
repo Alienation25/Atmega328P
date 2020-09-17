@@ -50,7 +50,7 @@ enum Display_panel
 };
 
 
-volatile unsigned char language = English;//язык
+volatile unsigned char language = Russion;//язык
 volatile unsigned char numD = 1;//Номер экрана с котором работаем сейчас 
 
 
@@ -100,7 +100,10 @@ void lcd_input_text(char textE[],char textR[]){
    default:
       break;
   }
+
 }
+
+
 
 
 
@@ -129,6 +132,9 @@ void control_Display(unsigned char numD){
 
 
 
+
+
+
 void system_program_encoder(){//функция для отлова движения энкодера   
     enc1.tick(); 
     if(enc1.isTurn())//если произошло движения энкодера в любую сторону
@@ -152,8 +158,12 @@ void system_program_encoder(){//функция для отлова движен�
          }
            control_Display(numD);
        }
-    
     }
+     if(enc1.isClick())
+     {
+
+
+     }
     
 }
 
