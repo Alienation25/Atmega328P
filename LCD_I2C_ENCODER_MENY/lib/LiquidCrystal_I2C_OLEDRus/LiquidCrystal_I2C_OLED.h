@@ -54,7 +54,7 @@
 
 class LiquidCrystal_I2C : public Print {
 public:
-  LiquidCrystal_I2C(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t lcd_rows);
+  LiquidCrystal_I2C(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t lcd_rows, uint8_t lcd_language );//0-Eng,1-Rus
   void begin(uint8_t cols, uint8_t rows, uint8_t charsize = LCD_5x8DOTS );
   void send(uint8_t, uint8_t);
   void clear();
@@ -80,8 +80,12 @@ public:
   void createChar(uint8_t, uint8_t[]);
   void createChar(uint8_t location, const char *charmap);
   // Example: 	const char bell[8] PROGMEM = {B00100,B01110,B01110,B01110,B11111,B00000,B00100,B00000};
-  void outStr(char str[]);  
+  void outStr(const char str[]);  
   void setCursor(uint8_t, uint8_t); 
+
+  void printLCD(const char textEng[],const char textRus[],unsigned char colum,unsigned char row);//input English text, input Russion text, colum and rows
+  void chenglanguage(uint8_t lcd_language /*English - 0 ,Russion - 1*/);
+
 #if defined(ARDUINO) && ARDUINO >= 100
   virtual size_t write(uint8_t);
 #else
@@ -98,6 +102,7 @@ void cursor_off();      					// alias for noCursor()
 void setBacklight(uint8_t new_val);				// alias for backlight() and nobacklight()
 void load_custom_character(uint8_t char_num, uint8_t *rows);	// alias for createChar()
 void printstr(const char[]);
+
 
 ////Unsupported API functions (not implemented in this library)
 uint8_t status();
@@ -125,6 +130,13 @@ private:
   uint8_t _cols;
   uint8_t _rows;
   uint8_t _backlightval;
+  uint8_t _language;//language output 
+  enum Language
+   {
+ English,
+ Russion,
+  };
+
 };
 
 #endif

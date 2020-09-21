@@ -31,8 +31,6 @@
 
 
 Encoder enc1(CLK, DT, SW);  // энкодер с кнопкой
-LiquidCrystal_I2C lcd(0x27,16,2);//экран Путь I2C и диагональ
-
 
 
 enum Language
@@ -40,6 +38,8 @@ enum Language
  English,
  Russion,
 };
+
+LiquidCrystal_I2C lcd(0x27,16,2,English);//экран Путь I2C и диагональ
 
 enum Display_panel
 {
@@ -49,61 +49,7 @@ enum Display_panel
 
 };
 
-
-volatile unsigned char language = Russion;//язык
 volatile unsigned char numD = 1;//Номер экрана с котором работаем сейчас 
-
-
-
-
-
-
-void lcd_input_text(char textE[],char textR[],unsigned char colum,unsigned char row){ //Ввод текста на экран 
-  switch (language)
-  {
-
-    case English:
-     lcd.clear();
-     lcd.setCursor(row,colum);
-     lcd.print(textE);//команда для ввывода английского языка
-    break;
-    
-    case Russion:
-     lcd.clear();
-     lcd.setCursor(row,colum);
-     lcd.outStr(textR);//команда для ввывода русского языка
-    break;
-    
-   default:
-      break;
-  }
-}
-
-
-
-
-void lcd_input_text(char textE[],char textR[]){
-   switch (language)
-  {
-    case English:
-     lcd.clear();
-     lcd.setCursor(0,1);
-     lcd.print(textE);//команда для ввывода английского языка
-    break;
-    
-    case Russion:
-     lcd.clear();
-     lcd.setCursor(0,1);
-     lcd.outStr(textR);//команда для ввывода русского языка
-    break;
-  
-   default:
-      break;
-  }
-
-}
-
-
 
 
 
@@ -111,28 +57,22 @@ void control_Display(unsigned char numD){
   switch (numD)
    {
    case DISPLAY_TEMP://дисплей отвечающий за температуру 
-     lcd_input_text("Hello","Привет");  
+     lcd.printLCD("Hello","Привет",1,0);  
     
      break;
    case DISPLAY_WIND://дисплей для ветра 
     
-    lcd_input_text("WIND: WET","Ветер: ветрений");   
+    lcd.printLCD("WIND: WET","Ветер: ветрений",1,0);   
     
      break;
    case DISPLAY_LUNIM://lbcgktq 
-     lcd_input_text("DAY: Time","День: время");  
+     lcd.printLCD("DAY: Time","День: время",1,0);  
   
     break;
    default:
      break;
    }
 }
-
-
-
-
-
-
 
 
 void system_program_encoder(){//функция для отлова движения энкодера   
@@ -159,8 +99,9 @@ void system_program_encoder(){//функция для отлова движен�
            control_Display(numD);
        }
     }
-     if(enc1.isClick())
+     if(enc1.isPress())
      {
+       lcd.chenglanguage(1);
 
 
      }
@@ -176,7 +117,7 @@ void setup() {
   lcd.setCursor(3,0);
   control_Display(numD);
   enc1.setType(TYPE2);
-
+  
 }
 
 

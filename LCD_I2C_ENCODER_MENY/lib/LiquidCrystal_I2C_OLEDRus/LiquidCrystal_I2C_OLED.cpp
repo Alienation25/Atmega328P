@@ -42,11 +42,12 @@ inline void LiquidCrystal_I2C::write(uint8_t value) {
 // can't assume that its in that state when a sketch starts (and the
 // LiquidCrystal constructor is called).
 
-LiquidCrystal_I2C::LiquidCrystal_I2C(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t lcd_rows)
+LiquidCrystal_I2C::LiquidCrystal_I2C(uint8_t lcd_Addr,uint8_t lcd_cols,uint8_t lcd_rows, uint8_t lcd_language )//I2C address, lcd colums ,lcd rows ,lcd fist language
 {
   _Addr = lcd_Addr;
   _cols = lcd_cols;
   _rows = lcd_rows;
+  _language = lcd_language;
   _backlightval = LCD_NOBACKLIGHT;
 }
 
@@ -257,7 +258,37 @@ inline void LiquidCrystal_I2C::command(uint8_t value) {
 	send(value, 0);
 }
 
-void LiquidCrystal_I2C::outStr(char str[]){  
+void LiquidCrystal_I2C::chenglanguage(uint8_t lcd_language){//English - 0 ,Russion - 1
+_language=lcd_language;
+}
+
+
+void LiquidCrystal_I2C::printLCD(const char textEng[],const char textRus[],unsigned char colum,unsigned char row){ 
+switch (_language)
+  {
+	case English:
+	 clear();
+	 setCursor(row,colum);
+	 print(textEng);
+	break;
+
+	case Russion:
+	 clear();
+	 setCursor(row,colum);
+	 outStr(textRus);
+	break;
+	
+	default:
+	break;
+
+
+  }
+
+}
+
+
+
+void LiquidCrystal_I2C::outStr(const char str[]){  
       int nn = 0; // symbol counter
       while (str[nn] != '\0')        {
             switch (str[nn]&0xFF){
