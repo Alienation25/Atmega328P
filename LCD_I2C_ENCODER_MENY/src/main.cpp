@@ -18,7 +18,6 @@
 #include<LiquidCrystal_I2C_OLED.h>
 #include <Max44009.h>
 #include<SparkFunBME280.h>
-
 #include<GyverEncoder.h>
 
 
@@ -40,13 +39,12 @@ enum Language
 
 
 Encoder enc1(CLK, DT, SW);  // энкодер с кнопкой
+
+
 LiquidCrystal_I2C lcd(0x27,16,2,English);//экран Путь I2C и диагональ
 BME280 sensorPressure(0x76);
 Max44009 sensorLuxA(0x4A);
 Max44009 sensorLuxB(0x4B);
-
-
-
 
 
 
@@ -59,11 +57,19 @@ enum Display_panel
 };
 
 volatile unsigned char numD = 1;//Номер экрана с котором работаем сейчас 
-float LuxA = 0 ;
-float LuxB = 0 ;
-float Pressure=0;
-char buffer[8];
-String display_text;
+volatile float LuxA = 0 ;
+volatile float LuxB = 0 ;
+volatile double Pressure=0;
+
+
+
+
+
+
+
+
+
+
 
 void control_Display(unsigned char numD){
   switch (numD)
@@ -71,30 +77,16 @@ void control_Display(unsigned char numD){
    case DISPLAY_TEMP://дисплей отвечающий за температуру 
      lcd.clear();
      
-     display_text="";  
+    
      break;
    case DISPLAY_WIND://дисплей для ветра 
      lcd.clear();
-      //display_text="Pres ";
-      //display_text+=dtostrf(Pressure,3,1,buffer);
-      lcd.print(sensorPressure.readFloatPressure());    
-    
-     display_text="";  
+   
   
-
-
      break;
-   case DISPLAY_LUNIM://lbcgktq 
+   case DISPLAY_LUNIM://дисплей для света  
      lcd.clear();
-     display_text="luxA ";
-     display_text+=dtostrf(LuxA,3,1,buffer);
-     display_text+="luxB ";
-     display_text+=dtostrf(LuxB,3,1,buffer);
-      
-      lcd.print(display_text.substring(0,9));  
-      lcd.setCursor(0,1);
-      lcd.print(display_text.substring(9));
-      display_text="";  
+    
   
     break;
    default:
@@ -103,66 +95,75 @@ void control_Display(unsigned char numD){
 }
 
 
-void system_program_encoder(){//функция для отлова движения энкодера   
-   
-    enc1.tick(); 
-    if(enc1.isTurn())//если произошло движения энкодера в любую сторону
-    {
-    
-      if (enc1.isRight())//  если произошло движение энкодера в право    
-       {
-         numD++;
-         if(!((int)numD < maxD)){
-           numD=maxD;
-         }
-         control_Display(numD);
-       }
 
 
-      if (enc1.isLeft()) //  если произошло движение энкодера в лево 
-       {
-         numD--;
+
+
+
+
+
+
+
+
+
+
+void isrCLK() {
+  enc1.tick();  // отработка в прерывании
+  if (enc1.isLeft()){
+          numD--;
          if(!(minD <= (int)numD)){
            numD=minD;
          }
-           control_Display(numD);
-       }
-    }
-     if(enc1.isPress())
-     {
-       lcd.chenglanguage(1);
-
-
-     }
-    
+         
+       
+  }
 }
+
+
+
+void isrDT() {
+  enc1.tick();  // отработка в прерывании
+  if (enc1.isRight()) {
+           numD++;
+         if(!((int)numD < maxD)){
+           numD=maxD;
+         }
+          
+  } 
+}
+
+
+
+
 
 
 
 void setup() {
-  Serial.begin(9600);
-  lcd.init();
-  lcd.backlight();
-  lcd.setCursor(0,0);
-  control_Display(numD);
-  enc1.setType(TYPE2);
+ Serial.begin(9600);
+ enc1.setType(TYPE2);
+ 
+ lcd.backlight();
+ lcd.init();
+ lcd.clear();
+ lcd.setCursor(0,0);
+
+ attachInterrupt(0, isrCLK, CHANGE);    // прерывание на 2 пине! CLK у энка
+ attachInterrupt(1, isrDT, CHANGE);    // прерывание на 3 пине! DT у энка
   
+  if(sensorPressure.beginI2C() == false) Serial.println("Sensor A connect failed");
+
+
 }
-
-
-
-
 
 
 void loop() {
-   system_program_encoder();
-
+   enc1.tick();
+   control_Display(numD);
    LuxA=sensorLuxA.getLux();
    LuxB=sensorLuxB.getLux();
-//   Pressure=sensorPressure.readFloatPressure();
-  
-   Serial.print(" PressureA: ");
-  Serial.print(sensorPressure.readFloatPressure(), 0);
+   Pressure=sensorPressure.readFloatPressure();  
+   delay(800);
 
 
 }
+
