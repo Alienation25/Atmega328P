@@ -184,7 +184,7 @@ class BME280
 	
 	//Constructor generates default BME280_SensorSettings.
 	//(over-ride after construction if desired)
-    BME280( void );
+    BME280( char _I2CAddress );
     //~BME280() = default;
 	
 	//Call to apply BME280_SensorSettings.

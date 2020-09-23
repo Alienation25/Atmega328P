@@ -326,15 +326,16 @@ template <typename T> T LiquidCrystal_I2C_Menu::inputValAt(uint8_t x, uint8_t y,
         continue;
       case eButton:
         return v;
-      case eLeft:
-        S = String(v);
-        if (v >= minValue + step) v -= step;
-        else v = minValue;
-        break;
       case eRight:
         S = String(v);
+        if (v >= minValue + step) v -= step;             
+        else v = minValue;
+        break;
+      case eLeft:
+         S = String(v);
         if (v + step <= maxValue) v += step;
         else v = maxValue;
+       
         break;
     }
     for (uint8_t i = 0; i < S.length(); i++)

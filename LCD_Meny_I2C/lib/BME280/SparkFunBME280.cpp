@@ -29,13 +29,13 @@ Distributed as-is; no warranty is given.
 //****************************************************************************//
 
 //Constructor -- Specifies default configuration
-BME280::BME280( void )
+BME280::BME280( char _I2CAddress )
 {
 	//Construct with these default settings
 
 	settings.commInterface = I2C_MODE; //Default to I2C
 
-	settings.I2CAddress = 0x77; //Default, jumper open is 0x77
+	settings.I2CAddress = _I2CAddress; //Default, jumper open is 0x77
 	_hardPort = &Wire; //Default to Wire port
 
 	settings.chipSelectPin = 10; //Select CS pin for SPI
@@ -386,7 +386,7 @@ float BME280::readFloatPressure( void )
 	var2 = (((int64_t)calibration.dig_P8) * p_acc) >> 19;
 	p_acc = ((p_acc + var1 + var2) >> 8) + (((int64_t)calibration.dig_P7)<<4);
 	
-	return (float)p_acc / 256.0;
+	return ((float)p_acc / 256.0)/100;
 	
 }
 
