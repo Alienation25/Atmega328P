@@ -407,8 +407,8 @@ eEncoderState LiquidCrystal_I2C_Menu::getEncoderState() {
       encoderA = digitalRead(_pinA);
       encoderB = digitalRead(_pinB);
       if ((!encoderA) && (_pinAPrev)) {
-        if (encoderB) Result = eRight;
-        else          Result = eLeft;
+        if (encoderB) Result = eLeft;
+        else          Result = eRight;
       }
       _pinAPrev = encoderA;
     }
