@@ -21,12 +21,15 @@
 ///
 ///Обновление єкрана
 #define refresh_display 100 
+//
 //Пины модулей
-#define PIN_MQ135  A0
-#define PIN_AM2301 8 
-#define PIN_DS18A 9
-#define PIN_DS18B 10
- 
+//
+#define PIN_MQ135  A0 //анализ газа жёлтый 
+#define PIN_Capacitive_Soil_Sensor1 A1 //анализатор грунта оранжевый 
+#define PIN_Capacitive_Soil_Sensor2 A2 //анализатор грунта красный
+#define PIN_AM2301 9 // Температуро анализатор бордовый
+#define PIN_DS18 10 // два датчика температуры черный 
+  
 
 
 LiquidCrystal_I2C_Menu lcd(0x27, 16, 2);
@@ -36,12 +39,45 @@ Max44009 LuxB(0x4B);
 MQ135 mq135(PIN_MQ135);
 DHT am2301(PIN_AM2301, DHT21);
 
-OneWire oneWireA(PIN_DS18A);
-DallasTemperature ds18A(&oneWireA);
 
 
-OneWire oneWireB(PIN_DS18B);
-DallasTemperature ds18B(&oneWireB);
+OneWire oneWireA(PIN_DS18);
+long lastUpdateTime = 0; // Переменная для хранения времени последнего считывания с датчика
+const int TEMP_UPDATE_TIME = 1000; // Определяем периодичность проверок
+int temperature=0;
+
+
+byte ds18A[8] = {0x28, 0x38, 0xE,0x5C, 0x1A, 0x19, 0x1,0x1A };
+byte ds18B[8] = {0x28, 0xAD, 0x62 ,0x41,0x1A, 0x19,0x1,0xD5 };
+
+
+int detectTemperature(byte addres[8]){  //Функция для работы с датчиками
+
+  byte data[2];
+  oneWireA.reset();
+  oneWireA.select(addres);
+  oneWireA.write(0x44);
+
+  if (millis() - lastUpdateTime > TEMP_UPDATE_TIME)
+  {
+    delay(10);
+    lastUpdateTime = millis();
+    oneWireA.reset();
+    oneWireA.select(addres);
+    oneWireA.write(0xBE);
+    data[0] = oneWireA.read();
+    data[1] = oneWireA.read();
+
+    // Формируем значение
+    temperature = (data[1] << 8) + data[0]; 
+    temperature = temperature >> 4;
+  }
+}
+
+
+
+
+
 
 
 
@@ -51,7 +87,7 @@ uint8_t language=1; //язык интерфейса
 
 // Объявим перечисление, используемое в качестве ключа пунктов меню
 enum {Russion,English};//потдержка языков
-enum {mkRoot,mkBack, mkLux, mkC02, mkPressure,mktemperatureAirHumidity ,mktemperatureUp,mktemperatureDown,mklanguage};
+enum {mkRoot,mkBack, mkLux, mkC02, mkPressure,mktemperatureAirHumidity ,mktemperatureUp,mktemperatureDown,mkcapacitiveSoil,mklanguage};
 
 //printWL("Датчик света","Sensor light").
 
@@ -66,7 +102,8 @@ sMenuItem menuRussion[] = {
     {mkBack, mktemperatureUp,"Температура верх"},
     {mkBack, mktemperatureDown,"Температура низ"},
     {mkBack, mktemperatureAirHumidity,"Температуры и влажность воздуха"},
-    {mkBack, mklanguage,"Язык"},
+    {mkBack, mkcapacitiveSoil,"Влажность почвы"},
+    //{mkBack, mklanguage,"Язык"},
     {mkRoot, mkBack, "Exit menu"}
 };
 
@@ -93,11 +130,7 @@ void setup() {
   Serial.print("MQ135 resistor = ");
   Serial.println(mq135.getRo());
 
-  ds18A.begin();
-  ds18A.setResolution(12);
-  ds18B.begin();
-  ds18B.setResolution(12);
-
+  
 
 
   if (BME280A.beginI2C() == false) //Begin communication over I2C
@@ -151,7 +184,8 @@ void loop() {
 
   else if (selectedMenuItem == mkPressure){ //датчик  BME-280(Давление)
      do
-     { 
+     {
+
        sensor_display("Давление",BME280A.readFloatPressure(),"hpa",0,0,1) ; 
        delay(refresh_display);
     
@@ -175,10 +209,10 @@ void loop() {
  else if (selectedMenuItem == mktemperatureUp){
     do
     {
-         ds18A.requestTemperatures();
-         sensor_display("Температура",ds18A.getTempCByIndex(0),"C",0,0,1);
-         //sensor_display("Температура",BME280A.readTempC(),"C",0,0,1) ; //датчик  BME-280(температура) 
-       delay(1000);
+        detectTemperature(ds18A);   
+        sensor_display("Температура",temperature,"C",0,0,0);
+        //sensor_display("Температура",BME280A.readTempC(),"C",0,0,1) ; //датчик  BME-280(температура) 
+        delay(refresh_display);
     
     } while (lcd.getEncoderState() == eNone);
  }
@@ -187,10 +221,24 @@ void loop() {
    else if (selectedMenuItem == mktemperatureDown){
     do
     {
-         ds18B.requestTemperatures();
-         sensor_display("Температура",ds18B.getTempCByIndex(0),"C",0,0,1);
+      
+         detectTemperature(ds18B);   
+         sensor_display("Температура",temperature,"C",0,0,0);
          //sensor_display("Температура",BME280A.readTempC(),"C",0,0,1) ; //датчик  BME-280(температура) 
-       delay(1000);
+         delay(refresh_display);
+       
+        
+    
+    } while (lcd.getEncoderState() == eNone);
+ }
+
+  else if (selectedMenuItem == mkcapacitiveSoil){
+    do
+    {
+     
+         sensor_display("Влажность",analogRead(PIN_Capacitive_Soil_Sensor1),"%",0,0,0);
+         sensor_display("Влажность",analogRead(PIN_Capacitive_Soil_Sensor2),"%",0,1,0);
+         
     
     } while (lcd.getEncoderState() == eNone);
  }
@@ -198,11 +246,18 @@ void loop() {
 
 
 
-  else if (selectedMenuItem == mkBack)
-           do{
-       lcd.print("Fals");
-       delay(refresh_display);
+  else if (selectedMenuItem == mkBack){
+    do
+    {
+
+        lcd.print("Fals");
+        delay(refresh_display);
+
      } while (lcd.getEncoderState() == eNone);
+
+  }
+
+
 
 }
 

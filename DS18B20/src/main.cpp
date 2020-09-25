@@ -1,37 +1,54 @@
 #include <Arduino.h>
-// библиотека для работы с протоколом 1-Wire
 #include <OneWire.h>
-// библиотека для работы с датчиком DS18B20
-#include <DallasTemperature.h>
- 
-// сигнальный провод датчика
-#define ONE_WIRE_BUS 10
- 
-// создаём объект для работы с библиотекой OneWire
-OneWire oneWire(ONE_WIRE_BUS);
- 
-// создадим объект для работы с библиотекой DallasTemperature
-DallasTemperature sensor(&oneWire);
- 
+
+OneWire ds(10); // Объект OneWire
+
+int temperature = 0; // Глобальная переменная для хранения значение температуры с датчика DS18B20
+
+long lastUpdateTime = 0; // Переменная для хранения времени последнего считывания с датчика
+const int TEMP_UPDATE_TIME = 1000; // Определяем периодичность проверок
+
 void setup(){
-  // инициализируем работу Serial-порта
   Serial.begin(9600);
-  // начинаем работу с датчиком
-  sensor.begin();
-  // устанавливаем разрешение датчика от 9 до 12 бит
-  sensor.setResolution(12);
 }
- 
+ byte ds18A[8] = {0x28, 0x38, 0xE,0x5C, 0x1A, 0x19, 0x1,0x1A };
+ byte ds18B[8] = {0x28, 0xAD, 0x62 ,0x41,0x1A, 0x19,0x1,0xD5 };
+
+
+
+
+int detectTemperature(byte addres[8]){  //Функция для работы с датчиками
+
+  byte data[2];
+  ds.reset();
+  ds.select(addres);
+  ds.write(0x44);
+
+  if (millis() - lastUpdateTime > TEMP_UPDATE_TIME)
+  {
+    lastUpdateTime = millis();
+    ds.reset();
+    ds.select(addres);
+    ds.write(0xBE);
+    data[0] = ds.read();
+    data[1] = ds.read();
+
+    // Формируем значение
+    temperature = (data[1] << 8) + data[0]; temperature = temperature >> 4;
+  }
+}
+
+
 void loop(){
-  // переменная для хранения температуры
-  float temperature;
-  // отправляем запрос на измерение температуры
-  sensor.requestTemperatures();
-  // считываем данные из регистра датчика
-  temperature = sensor.getTempCByIndex(0);
-  // выводим температуру в Serial-порт
-  Serial.print("Temp C: ");
+  detectTemperature(ds18A); // Определяем температуру от датчика DS18b20
   Serial.println(temperature);
-  // ждём одну секунду
-  delay(1000);
+  Serial.print(" A");
+
+  detectTemperature(ds18B); // Определяем температуру от датчика DS18b20
+  Serial.println(temperature); // Выводим полученное значение температуры
+  Serial.print(" B");
+ 
+ 
+  // Т.к. переменная temperature имеет тип int, дробная часть будет просто отбрасываться
 }
+
