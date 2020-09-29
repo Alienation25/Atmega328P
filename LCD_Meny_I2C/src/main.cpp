@@ -8,6 +8,12 @@
 #include <DHT.h> // библиотека для работы с датчиком AM2301
 #include <OneWire.h>// библиотека для работы с гигрометром 
 
+ /*
+  Serial.print("MQ135 resistor = "); 
+  Serial.println(mq135.getRo());//Вывод сопротивления нагревательного резистора
+  */
+  
+
 // Пины, к которым подключен энкодер
 #define pinCLK 2 
 #define pinDT  3 
@@ -20,9 +26,10 @@
 //
 #define PIN_MQ135  A0 //анализ газа (жёлтый) 
 #define PIN_Capacitive_Soil_Sensor1 A1 //анализатор грунта (оранжевый) 
-#define PIN_Capacitive_Soil_Sensor2 A2 //анализатор грунта (красный)
-#define PIN_AM2301 9 // Температуро анализатор (бордовый)
+#define PIN_AM2301A 9 // Температуро и влага анализатор (бордовый)
 #define PIN_DS18 10 // два датчика температуры (черный) 
+#define PIN_AM2301B 11 // Температуро и влага анализатор (белый)
+//#define PIN_Capacitive_Soil_Sensor2 A2 //анализатор грунта (красный)
 //  
 //I2C адреса и классы для работы
 //
@@ -31,7 +38,8 @@ BME280 BME280A(0x76);//датчик давления
 Max44009 LuxA(0x4A);// датчик освещёности 
 Max44009 LuxB(0x4B);// датчик освещёности 
 MQ135 mq135(PIN_MQ135);// датчик С02
-DHT am2301(PIN_AM2301, DHT21);// датчик температуры и влажности
+DHT am2301a(PIN_AM2301A, DHT21);// датчик температуры и влажности
+DHT am2301b(PIN_AM2301B, DHT21);// датчик температуры и влажности
 OneWire oneWireA(PIN_DS18);  //шина датчиков температуры (2 шт)
 //
 //Переменые для настройки работы датчика температуры (DS18) в функцие detectTemperature()
@@ -43,18 +51,22 @@ int language=1; //язык интерфейса
 long lastUpdateTime = 0; // Переменная для хранения времени последнего считывания с датчика
 const int TEMP_UPDATE_TIME = 1000; // Определяем периодичность проверок
 int temperature=0; //буферная переменая для хранения значения
-//
-// Перемненые для хранения 16 ричного кода для переменых 
-//
-byte ds18A[8] = {0x28, 0x38, 0xE,0x5C, 0x1A, 0x19, 0x1,0x1A };
-byte ds18B[8] = {0x28, 0xAD, 0x62 ,0x41,0x1A, 0x19,0x1,0xD5 };
-//
-//
+
+// Перемненые для хранения адресов датчикво в 16 ричном коде 
+
+
+byte ds18[2][8];//[2]- два датчика [8] - бит информации
+
+
+
+
+
+
 int detectTemperature(byte addres[8]){  //Функция для работы с датчиками DS18
   byte data[2];
   oneWireA.reset();// перезагрузка порта 
   oneWireA.select(addres);//выбор адресса для работы 
-  oneWireA.write(0x44); //запуск работы с клавиатурой 
+  oneWireA.write(0x44); //выбор режима сохранения 
 
   if (millis() - lastUpdateTime > TEMP_UPDATE_TIME)
   {
@@ -74,11 +86,31 @@ int detectTemperature(byte addres[8]){  //Функция для работы с 
 }
 
 
+
+
+void checkAddress( byte addr [2][8],OneWire ds)//поиск адресов (2 элемента) , шина oneWireA 10 
+{
+   for(int i=0;i<2;i++){
+      if (!ds.search(addr[i])) {
+        Serial.println(" No more addresses.");
+        ds.reset_search();
+        delay(250);
+      return;
+       }
+      
+      if (OneWire::crc8(addr[i], 7) != addr[i][7]) {
+        Serial.println("CRC is not valid!");
+        return;
+      }
+   }
+ ds.reset_search();
+}
+
+
+
 // Объявим перечисление, используемое в качестве ключа пунктов меню
 enum {Russion,English};//потдержка языков
-enum {mkRoot,mkBack, mkLux, mkC02, mkPressure,mktemperatureAirHumidity ,mktemperatureUp,mktemperatureDown,mkcapacitiveSoil,mklanguage};
-
-
+enum {mkRoot,mkBack, mkLux, mkC02, mkPressure,mktemperatureAirHumidity,mktemperatureUp,mktemperatureDown,mkcapacitiveSoil,mklanguage};//Вкладки меню
 
 // Описание меню
 // структура пункта меню: {ParentKey, Key, Caption, [Handler]}
@@ -94,25 +126,31 @@ sMenuItem menuRussion[] = {
     {mkRoot, mkBack, "Exit menu"}
 };
 
-
 uint8_t menuLen = sizeof(menuRussion) / sizeof(sMenuItem);//Структура для хранения значений датчиков 
 
-
+bool work;
 void setup() {
   Serial.begin(9600);//запуск UART(RX TX)
+
   lcd.begin();//запуск экрана 
   lcd.attachEncoder(pinDT, pinCLK, pinSW);//запуск энкодера
-  am2301.begin();//запуск датчика температуры и влажности 
-  mq135.calibrate(); //калибровка датчика
-
-  Serial.print("MQ135 resistor = "); 
-  Serial.println(mq135.getRo());//Вывод в меню сопротивления нагревательного резистора
+  lcd.printAt(0,0,"ШКОЛА РОБОТОТЕХНИКИ");
+  lcd.printAt(0,1,"Вперед в Будущее");
+  delay(5000);
   
+  am2301a.begin();//запуск датчика температуры и влажности 
+  am2301b.begin();//запуск датчика температуры и влажности 
+
+  mq135.calibrate(); //калибровка датчика
+  checkAddress(ds18,oneWireA);//наличие датчиков ds18  
+ 
   if (BME280A.beginI2C() == false) //Проверка I2C
   {
     Serial.println("Cенсор не найден.");
   }
 }
+
+
 
 
 
@@ -125,11 +163,20 @@ void sensor_display(String name,float number_sensor,String unit,char r,char c,ch
 
 void loop() {
 
+
+
+
+
+
+
+
+
   uint8_t selectedMenuItem = lcd.showMenu(menuRussion, menuLen, 0);  // Показываем меню
   // И выполняем действия в соответствии с выбранным пунктом
   if (selectedMenuItem == mkLux){  //два датчика GY-49(датчики света)
       do
       {
+
         sensor_display("Свет",LuxA.getLux(),"лм",0,0,0) ; 
         sensor_display("Свет",LuxB.getLux(),"лм",0,1,0) ; 
         delay(refresh_display);
@@ -141,6 +188,7 @@ void loop() {
   else if (selectedMenuItem == mkC02){ //С02 (датчик угарного газа) 
      do
      {  
+
         sensor_display("C02",mq135.readCO2(),"ppm",0,0,0) ;
         delay(refresh_display);
     
@@ -163,8 +211,8 @@ void loop() {
   else if (selectedMenuItem == mktemperatureAirHumidity){//DH21 (AM2301)(датчик температуры и влажности)
     do
     {
-        sensor_display("Температура",am2301.readTemperature(),"С",0,0,1) ; 
-        sensor_display("Влажность",am2301.readHumidity(),"%",0,1,1) ; 
+        sensor_display("Температура",am2301b.readTemperature(),"С",0,0,1) ; 
+        sensor_display("Влажность",am2301b.readHumidity(),"%",0,1,1) ; 
         //sensor_display("Влага",BME280A.readFloatHumidity(),"%",0,1,1) ; //датчик  BME-280(влажности)
         delay(refresh_display);
        
@@ -176,7 +224,7 @@ void loop() {
  else if (selectedMenuItem == mktemperatureUp){//DS18 (Датчик температуры )
     do
     {
-        detectTemperature(ds18A);   
+        detectTemperature(ds18[0]);   
         sensor_display("Температура",temperature,"C",0,0,0);
         //sensor_display("Температура",BME280A.readTempC(),"C",0,0,1) ; //датчик  BME-280(температура) 
         delay(refresh_display);
@@ -189,13 +237,11 @@ void loop() {
     do
     {
       
-         detectTemperature(ds18B);   
+         detectTemperature(ds18[1]);   
          sensor_display("Температура",temperature,"C",0,0,0);
          //sensor_display("Температура",BME280A.readTempC(),"C",0,0,1) ; //датчик  BME-280(температура) 
          delay(refresh_display);
-       
-        
-    
+  
     } while (lcd.getEncoderState() == eNone);
  }
 
@@ -203,9 +249,7 @@ void loop() {
     do
     {
      
-         sensor_display("Влажность",analogRead(PIN_Capacitive_Soil_Sensor1),"%",0,0,0);
-         sensor_display("Влажность",analogRead(PIN_Capacitive_Soil_Sensor2),"%",0,1,0);
-         
+         sensor_display("Влажность",analogRead(PIN_Capacitive_Soil_Sensor1),"%",0,0,0);       
     
     } while (lcd.getEncoderState() == eNone);
  }

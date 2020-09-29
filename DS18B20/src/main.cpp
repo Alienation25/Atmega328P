@@ -1,3 +1,4 @@
+
 #include <Arduino.h>
 #include <OneWire.h>
 
@@ -51,4 +52,9 @@ void loop(){
  
   // Т.к. переменная temperature имеет тип int, дробная часть будет просто отбрасываться
 }
+
+
+
+
+
 
