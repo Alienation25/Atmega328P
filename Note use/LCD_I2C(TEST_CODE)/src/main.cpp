@@ -69,7 +69,7 @@ void setup()
   lcd.createChar(1, bukva_P);      // Создаем символ под номером 1
   lcd.createChar(2, bukva_I);      // Создаем символ под номером 2
   lcd.setCursor(3, 0);             // Устанавливаем курсор на 1 строку ячейку 3
-  lcd.print("\1P\2BET M\2P");      // 1->П  , 2->И print->Вывод информации
+  lcd.print("Hello");      // 1->П  , 2->И print->Вывод информации
  
  
   //lcd.clear();//Функция для очистки 
