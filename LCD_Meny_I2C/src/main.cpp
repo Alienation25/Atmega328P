@@ -20,7 +20,7 @@
 #define pinSW  4 
 ///
 ///Обновление єкрана
-#define refresh_display 120
+#define refresh_display 200
 //
 //Пины модулей
 //
@@ -28,7 +28,7 @@
 #define PIN_Capacitive_Soil_Sensor1 A1 //анализатор грунта (оранжевый) 
 #define PIN_AM2301A 9 // Температуро и влага анализатор (бордовый)
 #define PIN_AM2301B 11//11 // Температуро и влага анализатор (белый)
-#define PIN_DS18 10//10 // два датчика температуры (черный) 
+#define PIN_DS18 7// первый датчик (6) 
 
 //#define PIN_Capacitive_Soil_Sensor2 A2 //анализатор грунта (красный)
 //  
@@ -89,7 +89,7 @@ int detectTemperature(byte addres[8]){  //Функция для работы с 
 
 
 
-void checkAddress( byte addr [2][8],OneWire ds)//поиск адресов (2 элемента) , шина oneWireA 10 
+void checkAddress( byte addr [2][8],OneWire ds)//поиск адресов (2 элемента) , шина oneWireA 7,6 
 {
    for(int i=0;i<2;i++){
       if (!ds.search(addr[i])) {
@@ -178,7 +178,7 @@ delay(1000);
 
 
 void sensor_UART(){
-    Serial.println("S");
+    Serial.println("#");
      Serial.println(LuxA.getLux()); //lm  // fl //\n
      Serial.println(LuxB.getLux()); //lm  // fl //\n
      Serial.println(mq135.readCO2());//ppm // ulong
@@ -190,7 +190,7 @@ void sensor_UART(){
     temp();
     Serial.println(analogRead(PIN_Capacitive_Soil_Sensor1));//% //i
     
-    Serial.println("E");
+    Serial.println("$");
 }
 
 
